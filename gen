@@ -5,13 +5,13 @@ BUILDROOT="$SCRIPTROOT/build"
 KICKSTART="CentOS-6.5-x86_64-default.ks"
 ISO_URL="http://mirror.switch.ch/ftp/mirror/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-netinstall.iso"
 
-ISO_NAME=`basename $ISO_URL`
+ISO_NAME="`basename $ISO_URL`"
 #TAG=`cd $SCRIPTROOT; git tag | sort -V | tail -n 1`
 #ISO_GEN_NAME=`echo $ISO_NAME | sed 's/-netinstall.iso$//'`-default-$TAG
 ISO_GEN_NAME=`echo $ISO_NAME | sed 's/-netinstall.iso$//'`-default
 
 cleanup() {
-  mount | grep -q $ISO_NAME && umount mnt
+  mount | grep -q "$ISO_NAME" && umount mnt
   rm -rf build/*
 }
 
@@ -19,7 +19,8 @@ cleanup() {
 set -e
 
 # change to buildroot
-cd $BUILDROOT
+mkdir -p "$BUILDROOT"
+cd "$BUILDROOT"
 
 # setup dirs
 mkdir -p {dist,mnt,build,gen}
@@ -28,16 +29,16 @@ mkdir -p {dist,mnt,build,gen}
 cleanup
 
 # fetch iso
-test -f dist/$ISO_NAME || wget -nc -O dist/$ISO_NAME $ISO_URL
+test -f "dist/$ISO_NAME" || wget -nc -O "dist/$ISO_NAME" "$ISO_URL"
 
 # mount iso
-mount -o loop dist/$ISO_NAME mnt
+mount -o loop "dist/$ISO_NAME" mnt
 
 # cp files to build
 cp -a mnt/* build
 
 # add kickstart
-cp $SCRIPTROOT/$KICKSTART build/isolinux/custom.ks
+cp "$SCRIPTROOT/$KICKSTART" build/isolinux/custom.ks
 
 # add ks option to boot menu entries
 sed -i 's/append/append ks=cdrom:custom.ks/' build/isolinux/isolinux.cfg
@@ -46,7 +47,7 @@ sed -i 's/append/append ks=cdrom:custom.ks/' build/isolinux/isolinux.cfg
 sed -i 's/timeout.*/timeout 5/' build/isolinux/isolinux.cfg
 
 # build iso
-mkisofs -o gen/$ISO_GEN_NAME.iso -r -R -J -input-charset utf-8 \
+mkisofs -o "gen/$ISO_GEN_NAME.iso" -r -R -J -input-charset utf-8 \
   -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
   -V "CentOS 6" -A "CentOS 6" -p Six -T build/isolinux/
 
