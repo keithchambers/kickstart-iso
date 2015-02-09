@@ -2,7 +2,7 @@
 
 SCRIPTROOT="`dirname $(readlink -f $0)`"
 BUILDROOT="$SCRIPTROOT/build"
-KICKSTART="CentOS-6.5-x86_64-default.ks"
+KICKSTART="CentOS-6.6-x86_64-default.ks"
 ISO_URL="http://mirror.switch.ch/ftp/mirror/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-netinstall.iso"
 
 ISO_NAME="`basename $ISO_URL`"
