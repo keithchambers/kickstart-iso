@@ -42,4 +42,35 @@ wget
 exec < /dev/tty3 > /dev/tty3
 /usr/bin/chvt 3
 
-exit 0
+yum -t -y -e 0 install puppet --skip-broken
+yum clean all
+
+rpm -Uvh http://mirror.switch.ch/ftp/mirror/epel/6/i386/epel-release-6-8.noarch.rpm
+yum -t -y -e 0 install open-vm-tools --skip-broken
+chkconfig vmtoolsd on
+
+yum -t -y -e 0 upgrade
+
+cat <<-EOD > /etc/puppet/puppet.conf
+[main]
+  confdir = /etc/puppet
+  vardir = /var/lib/puppet
+  logdir = /var/log/puppet
+  rundir = /var/run/puppet
+  pluginsync = true
+
+[agent]
+  classfile = \$vardir/classes.txt
+  localconfig = \$vardir/localconfig
+  ssldir = \$vardir/ssl
+  logdest = /var/log/puppet/puppet.log
+  environment = production
+  server = puppet
+  report = true
+EOD
+
+/bin/touch /etc/puppet/namespaceauth.conf
+hash puppet && puppet agent --test
+
+eject
+%end
